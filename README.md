@@ -17,10 +17,10 @@ LCD:
 * wiper to LCD VO pin (pin 3)
 
 Buttons:
-* digital pin 8
-* digital pin 9
+* digital pin 8:
+* digital pin 9: START/STOP button
 
 LEDs:
-* digital pin 6
-* digital pin 7
+* digital pin 6: "Pommodoro in progress" LED, I use a red LED
+* digital pin 7: "Waiting" LED, I use a green LED
 
