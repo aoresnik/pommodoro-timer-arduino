@@ -20,6 +20,7 @@ enum devicestate {
 devicestate state = waiting;
 
 unsigned long pommodoro_end_time;
+unsigned long waiting_start;
 
 #define POMMODORO_MINUTES 25
 
@@ -45,6 +46,8 @@ void setup() {
   pinMode(LED_POMMODORO, OUTPUT);
   pinMode(SWITCH_RESERVED, INPUT);
   pinMode(SWITCH_START_STOP, INPUT);
+
+  waiting_start = millis();
 }
 
 void loop() {
@@ -70,13 +73,14 @@ void loop() {
       output[LCD_WIDTH] = '\0';
       lcd.print(output);
 
-      if (millis() >= pommodoro_end_time) {
+      if (secondsRemaining == 0) {
         state = waiting;
+        waiting_start = millis();
       }
       break;
     case waiting:
-      // Blink the green LED; FIXME: this produces random interval for first blink
-      digitalWrite(LED_WAITING, ((millis() / 1000) % 2 != 0) ? HIGH : LOW);
+      // Blink the green LED
+      digitalWrite(LED_WAITING, (((millis()-waiting_start) / 1000) % 2 != 0) ? HIGH : LOW);
       digitalWrite(LED_POMMODORO, LOW);
 
       if (digitalRead(SWITCH_START_STOP)) {
