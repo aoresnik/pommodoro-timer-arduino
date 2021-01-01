@@ -56,13 +56,18 @@ void loop() {
       digitalWrite(LED_WAITING, LOW);
       digitalWrite(LED_POMMODORO, HIGH);
 
+      char s[6]; // For number of seconds
       char output[LCD_WIDTH + 1];
 
-      // Print number of seconds remaining in the current pommodoro
+      // Centered print number of seconds remaining in the current pommodoro
       lcd.setCursor(0, 1);
       int secondsRemaining;
       secondsRemaining = (pommodoro_end_time-millis()+999) / 1000;
-      sprintf(output, "%5d", secondsRemaining);
+      sprintf(s, "%5d", secondsRemaining);
+      memset(output, ' ', LCD_WIDTH);
+      int s_len;
+      s_len = strlen(s);
+      memcpy(output + (LCD_WIDTH-s_len)/2, s, s_len);
       lcd.print(output);
       
       // Draw a bar graph of time remaining
