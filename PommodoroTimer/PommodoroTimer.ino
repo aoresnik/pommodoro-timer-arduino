@@ -63,11 +63,11 @@ void loop() {
       lcd.setCursor(0, 1);
       int secondsRemaining;
       secondsRemaining = (pommodoro_end_time-millis()+999) / 1000;
-      sprintf(s, "%5d", secondsRemaining);
+      sprintf(s, "%d sec", secondsRemaining);
       memset(output, ' ', LCD_WIDTH);
       int s_len;
       s_len = strlen(s);
-      memcpy(output + (LCD_WIDTH-s_len)/2, s, s_len);
+      memcpy(output + (LCD_WIDTH-s_len+1)/2, s, s_len);
       lcd.print(output);
       
       // Draw a bar graph of time remaining
