@@ -56,6 +56,8 @@ class Button {
     };
 
     // Returns true if button state has changed from from to to since last call
+    // Limitations: doesn't buffer changes, so it must be called often. If the
+    // button is pressed and released between two calls, it's not detected.
     boolean stateChanged(int from, int to) {
       if (millis() >= lastChangeTime + DEBOUNCE_TIME_MS) {
         int newState = digitalRead(input);
