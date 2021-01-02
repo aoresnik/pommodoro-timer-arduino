@@ -132,16 +132,39 @@ void loop() {
       break;
     case waiting:
       // Blink the green LED
-      digitalWrite(LED_WAITING, (((millis()-waiting_start) / 1000) % 2 != 0) ? HIGH : LOW);
+      long waitingTimeSec;
+      waitingTimeSec = (millis()-waiting_start) / 1000;
+      digitalWrite(LED_WAITING, (waitingTimeSec % 2 != 0) ? HIGH : LOW);
       digitalWrite(LED_POMMODORO, LOW);
 
-      memset(output, ' ', LCD_WIDTH);
+      long t;
+      const char *unit;
+      if (waitingTimeSec > 84600) {
+        t = waitingTimeSec/84600;
+        unit = "d";
+      } else if (waitingTimeSec > 3600) {
+        t = waitingTimeSec/3600;
+        unit = "h";
+      } else if (waitingTimeSec > 60) {
+        t = waitingTimeSec/60;
+        unit = "m";
+      } else {
+        t = waitingTimeSec;
+        unit = "s";
+      }
+
+      int len;
+      len = sprintf(output, "Waiting %ld%s", t, unit);
+      memset(output + len, ' ', LCD_WIDTH - len);
       output[LCD_WIDTH] = '\0';
       lcd.setCursor(0, 0);
       lcd.print(output);
+      
+      memset(output, ' ', LCD_WIDTH);
+      output[LCD_WIDTH] = '\0';
       lcd.setCursor(0, 1);
       lcd.print(output);
-
+      
       if (startStopButton.stateChanged(LOW, HIGH)) {
         pommodoro_end_time = millis() + POMMODORO_MINUTES * 60L * 1000L;
         state = pommodoro;
