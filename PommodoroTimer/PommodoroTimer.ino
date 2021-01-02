@@ -60,6 +60,11 @@ byte startSymbol[8] = {
   B10000,
 };
 
+#define CHAR_START 1
+#define CHARS_PROGRESS 4
+
+char progressChars[6];
+
 class Button {
   // Switch debounce - based on https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
   private:
@@ -123,8 +128,10 @@ void lcdPrintfCentered(int line, const char* format, ...) {
 void lcdDrawBarGraph(int line, long qty, long qtyMax) {
   char output[LCD_WIDTH+1];
   outputBufferClear(output);
+  int len = (qty * (LCD_WIDTH*5) + qtyMax-1) / qtyMax; // round up
   // 0xFF in default charset: character with all pixels set
-  memset(output, '\377', (qty * LCD_WIDTH + qtyMax-1) / qtyMax); // round up
+  memset(output, '\377', len / 5);
+  output[len / 5] = progressChars[len % 5];
   output[LCD_WIDTH] = '\0';
   lcd.setCursor(0, 0);
   lcd.print(output);
@@ -149,10 +156,23 @@ void formatTimeUnit(char *s, int s_maxlen, long timeSeconds) {
   snprintf(s, s_maxlen, "%ld%s", t, unit);
 }
 
+void lcdCreateProgressBarChars() {
+  byte charData[8];
+  progressChars[0] = ' ';
+  for (int i = 1; i <= 4; i++) {
+    char c = CHARS_PROGRESS + i-1;
+    progressChars[i] = c;
+    memset(charData, (0x1F << (5-i)) & 0x1F, 8);
+    lcd.createChar(c, charData);
+  }
+  progressChars[5] = '\377';
+}
+
 Button startStopButton(SWITCH_START_STOP);
 
 void setup() {
-  lcd.createChar(1, startSymbol);
+  lcd.createChar(CHAR_START, startSymbol);
+  lcdCreateProgressBarChars();
   
   // set up the LCD's number of columns and rows:
   lcd.begin(LCD_WIDTH, LCD_HEIGHT);
