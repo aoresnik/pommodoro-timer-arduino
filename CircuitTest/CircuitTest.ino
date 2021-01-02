@@ -25,7 +25,6 @@ void setup() {
   digitalWrite(6, HIGH);
   pinMode(7, OUTPUT);
   digitalWrite(7, HIGH);
-  pinMode(8, INPUT);
   pinMode(9, INPUT);
 }
 
@@ -38,6 +37,5 @@ void loop() {
 
   // print button state; TODO: debounce and test debouncing
   lcd.print(" ");
-  lcd.print(digitalRead(8) ? "on  " : "off ");
   lcd.print(digitalRead(9) ? "on  " : "off ");
 }
