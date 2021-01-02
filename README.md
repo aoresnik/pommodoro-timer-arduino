@@ -56,7 +56,9 @@ have a separate device for that, because you don't have to switch apps, move mou
 
 Alternatively, you can use an old Android/iPhone that you dedicate for Pommodoro timer app.
 
-## The circuit
+## Assembly
+
+### The circuit
 
 I used components from the Arduino Starter kit - other 
 
@@ -95,3 +97,9 @@ LEDs:
 * digital pin 6: "Pommodoro in progress" LED, I use a red LED
 * digital pin 7: "Waiting" LED, I use a green LED
 
+### Software
+
+Using the Arduino environment, open and load CircuitTest/CircuitTest.ino sketch to verify correct assembly:
+should illuminate both LEDs and print the state of the button on the LCD.
+
+Open and load the PommodoroTimer/PommodoroTimer.ino sketch for the main firmware.
