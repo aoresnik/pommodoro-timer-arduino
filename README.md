@@ -1,6 +1,64 @@
 # Pommodoro Timer based on Arduino
 
+## Description
+
+This is an Arduino-based Pommodoro timer. It's intended as an accessory to help working by the
+[Pommodoro technique](https://en.wikipedia.org/wiki/Pomodoro_Technique) for personal productivity. 
+It requires an Arduino (tested with Arduino Uno) with some additional hardware: LCD, switches 
+and LEDs (documented below).
+
+## How to use
+
+You should read the entire documentation and the book on how to practice Pommodoro properly - this
+is only a short summary how this device can help.
+
+Press the start/stop key to start a Pommodoro. This will start the countdown of 25 minutes. A 
+red LED will also illuminate while the pommodoro is active, meaning "do not interrupt activity 
+in progress".
+
+```
+▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉
+    1500 sec
+```
+
+When  a Pommodoro is completed, the green LED will blink to remind you that you can take a break.
+The device will display how much time has passed since the end of the last pommodoro:
+
+```
+ Last: completed
+    15m ago
+```
+
+You can determine when it's time to end the breaks (3-5 minutes for short breaks, 15-30 minutes
+for long breaks). This is also intended to nudge you out of procrastination. A blinking green light
+is intended to remind you that a break is in progress, but you should not take too much time.
+
+If some external interruption occurs that warrants aborting the current Pommodoro, you press
+the start/stop key again. The device will show how long ago the abort happened:
+
+```
+  Last: aborted
+     23m ago
+```
+
+There's no additional functionality, such as tracking the long and short breaks, work targets, ...
+The author of the Pommodooro technique recommends these to be done manuallly on pen and paper.
+The point of this device is only to help tracking time.
+
+This is prototype for now  - I plan to design a 3D printed case for that, but it's not implemented yet.
+
+## FAQ
+
+### Why separate device? There's an app for that!
+
+True, there are many apps for working with the Pommodoro technique, but it's less disrupting to 
+have a separate device for that, because you don't have to switch apps, move mouse, ....
+
+Alternatively, you can use an old Android/iPhone that you dedicate for Pommodoro timer app.
+
 ## The circuit
+
+I used components from the Arduino Starter kit - other 
 
 Breadboard view (maintained in [Fritzing file](circuit/pommodoro-timer.fzz)).
 
@@ -12,7 +70,9 @@ Schematics:
 
 Connections:
 
-LCD:
+LCD:  connected as documented in the LCD [Hello world example](https://www.arduino.cc/en/Tutorial/LibraryExamples/HelloWorld).
+I used JHD 162A LCD - any LCD screen 16x2, that is compatible with Arduion LiquidCrystal library 
+can be used, but some may require changes.
 
 * LCD RS pin to digital pin 12
 * LCD Enable pin to digital pin 11
@@ -23,13 +83,11 @@ LCD:
 * LCD R/W pin to ground
 * LCD VSS pin to ground
 * LCD VCC pin to 5V
-* 10K resistor:
-* ends to +5V and ground
-* wiper to LCD VO pin (pin 3)
+* R1: 10K trimmer to adjust LCD contrast, ends to +5V and ground, wiper to LCD VO pin (pin 3)
+* R2: current limiter for LCD backlight
 
 Buttons:
 
-* digital pin 8:
 * digital pin 9: START/STOP button
 
 LEDs:
