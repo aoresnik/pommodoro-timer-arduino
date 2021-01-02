@@ -9,6 +9,8 @@
 
 */
 
+#include <stdarg.h>
+
 // include the library code:
 #include <LiquidCrystal.h>
 
@@ -108,6 +110,16 @@ void lcdPrintCentered(int line, const char* text) {
   lcd.print(output);
 }
 
+void lcdPrintfCentered(int line, const char* format, ...) {
+  char s[LCD_WIDTH+1];
+  va_list ap;
+  va_start(ap, format);
+  vsnprintf(s, sizeof(s), format, ap);
+  s[LCD_WIDTH] = '\0';
+  lcdPrintCentered(line, s);
+  va_end(ap);
+}
+
 void lcdDrawBarGraph(int line, long qty, long qtyMax) {
   char output[LCD_WIDTH+1];
   outputBufferClear(output);
@@ -116,6 +128,25 @@ void lcdDrawBarGraph(int line, long qty, long qtyMax) {
   output[LCD_WIDTH] = '\0';
   lcd.setCursor(0, 0);
   lcd.print(output);
+}
+
+void formatTimeUnit(char *s, int s_maxlen, long timeSeconds) {
+  long t;
+  const char *unit;
+  if (timeSeconds > 84600) {
+    t = timeSeconds/84600;
+    unit = "d";
+  } else if (timeSeconds > 3600) {
+    t = timeSeconds/3600;
+    unit = "h";
+  } else if (timeSeconds > 60) {
+    t = timeSeconds/60;
+    unit = "m";
+  } else {
+    t = timeSeconds;
+    unit = "s";
+  }
+  snprintf(s, s_maxlen, "%ld%s", t, unit);
 }
 
 Button startStopButton(SWITCH_START_STOP);
@@ -144,13 +175,10 @@ void loop() {
       digitalWrite(LED_WAITING, LOW);
       digitalWrite(LED_POMMODORO, HIGH);
 
-      char s[6]; // For number of seconds
-
       // Centered print number of seconds remaining in the current pommodoro
       int secondsRemaining;
       secondsRemaining = (pommodoro_end_time-millis()+999) / 1000;
-      sprintf(s, "%d sec", secondsRemaining);
-      lcdPrintCentered(1, s);
+      lcdPrintfCentered(1, "%d sec", secondsRemaining);
       
       // Draw a bar graph of time remaining
       lcdDrawBarGraph(0, secondsRemaining, POMMODORO_MINUTES*60);
@@ -166,39 +194,24 @@ void loop() {
         endReason = aborted;
       }
       break;
+      
     case waiting:
-      // Blink the green LED
       long waitingTimeSec;
+
+      // Blink the green LED
       waitingTimeSec = (millis()-waiting_start) / 1000;
       digitalWrite(LED_WAITING, (waitingTimeSec % 2 != 0) ? HIGH : LOW);
       digitalWrite(LED_POMMODORO, LOW);
 
+      formatTimeUnit(output, sizeof(output), waitingTimeSec);
       if (endReason != none) {
-        sprintf(output, "Last: %s", (endReason == completed ? "completed" : "aborted"));
+        lcdPrintfCentered(0, "Last: %s", (endReason == completed ? "completed" : "aborted"));
+        lcdPrintfCentered(1, "%s ago", output);
       } else {
-        sprintf(output, "\001/\377 to start");
+        lcdPrintfCentered(0, "\001/\377 to start");
+        lcdPrintfCentered(1, "%s", output);
       }
-      lcdPrintCentered(0, output);
-
-      long t;
-      const char *unit;
-      if (waitingTimeSec > 84600) {
-        t = waitingTimeSec/84600;
-        unit = "d";
-      } else if (waitingTimeSec > 3600) {
-        t = waitingTimeSec/3600;
-        unit = "h";
-      } else if (waitingTimeSec > 60) {
-        t = waitingTimeSec/60;
-        unit = "m";
-      } else {
-        t = waitingTimeSec;
-        unit = "s";
-      }
-
-      sprintf(output, endReason != none ? "%ld%s ago" : "%ld%s", t, unit);
-      lcdPrintCentered(1, output);
-      
+     
       if (startStopButton.stateChanged(LOW, HIGH)) {
         pommodoro_end_time = millis() + POMMODORO_MINUTES * 60L * 1000L;
         state = pommodoro;
