@@ -17,10 +17,18 @@ enum devicestate {
   waiting
 };
 
+enum endreason {
+  none,
+  completed,
+  aborted
+};
+
 devicestate state = waiting;
 
 unsigned long pommodoro_end_time;
 unsigned long waiting_start;
+
+endreason endReason;
 
 #define POMMODORO_MINUTES 25
 
@@ -39,6 +47,16 @@ unsigned long waiting_start;
 // with the arduino pin number it is connected to
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+byte startSymbol[8] = {
+  B10000,
+  B11000,
+  B11100,
+  B11110,
+  B11100,
+  B11000,
+  B10000,
+};
 
 class Button {
   // Switch debounce - based on https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
@@ -75,9 +93,36 @@ class Button {
     }
 };
 
+// outputBuffer must have length of LCD_WIDTH+1
+void outputBufferClear(char *output) {
+  memset(output, ' ', LCD_WIDTH);
+  output[LCD_WIDTH] = '\0';
+}
+
+void lcdPrintCentered(int line, const char* text) {
+  char output[LCD_WIDTH+1];
+  outputBufferClear(output);
+  int text_len = strlen(text);
+  memcpy(output + (LCD_WIDTH-text_len+1)/2, text, text_len);
+  lcd.setCursor(0, line);
+  lcd.print(output);
+}
+
+void lcdDrawBarGraph(int line, long qty, long qtyMax) {
+  char output[LCD_WIDTH+1];
+  outputBufferClear(output);
+  // 0xFF in default charset: character with all pixels set
+  memset(output, '\377', (qty * LCD_WIDTH + qtyMax-1) / qtyMax); // round up
+  output[LCD_WIDTH] = '\0';
+  lcd.setCursor(0, 0);
+  lcd.print(output);
+}
+
 Button startStopButton(SWITCH_START_STOP);
 
 void setup() {
+  lcd.createChar(1, startSymbol);
+  
   // set up the LCD's number of columns and rows:
   lcd.begin(LCD_WIDTH, LCD_HEIGHT);
 
@@ -102,32 +147,23 @@ void loop() {
       char s[6]; // For number of seconds
 
       // Centered print number of seconds remaining in the current pommodoro
-      lcd.setCursor(0, 1);
       int secondsRemaining;
       secondsRemaining = (pommodoro_end_time-millis()+999) / 1000;
       sprintf(s, "%d sec", secondsRemaining);
-      memset(output, ' ', LCD_WIDTH);
-      output[LCD_WIDTH] = '\0';
-      int s_len;
-      s_len = strlen(s);
-      memcpy(output + (LCD_WIDTH-s_len+1)/2, s, s_len);
-      lcd.print(output);
+      lcdPrintCentered(1, s);
       
       // Draw a bar graph of time remaining
-      lcd.setCursor(0, 0);
-      memset(output, ' ', LCD_WIDTH);
-      // 0xFF in default charset: character with all pixels set
-      memset(output, '\377', (secondsRemaining * LCD_WIDTH + (POMMODORO_MINUTES*60)-1) / (POMMODORO_MINUTES*60)); // round up
-      output[LCD_WIDTH] = '\0';
-      lcd.print(output);
+      lcdDrawBarGraph(0, secondsRemaining, POMMODORO_MINUTES*60);
 
       if (secondsRemaining == 0) {
         state = waiting;
         waiting_start = millis();
+        endReason = completed;
       }
       if (startStopButton.stateChanged(LOW, HIGH)) {
         state = waiting;
         waiting_start = millis();
+        endReason = aborted;
       }
       break;
     case waiting:
@@ -136,6 +172,13 @@ void loop() {
       waitingTimeSec = (millis()-waiting_start) / 1000;
       digitalWrite(LED_WAITING, (waitingTimeSec % 2 != 0) ? HIGH : LOW);
       digitalWrite(LED_POMMODORO, LOW);
+
+      if (endReason != none) {
+        sprintf(output, "Last: %s", (endReason == completed ? "completed" : "aborted"));
+      } else {
+        sprintf(output, "\001/\377 to start");
+      }
+      lcdPrintCentered(0, output);
 
       long t;
       const char *unit;
@@ -153,17 +196,8 @@ void loop() {
         unit = "s";
       }
 
-      int len;
-      len = sprintf(output, "Waiting %ld%s", t, unit);
-      memset(output + len, ' ', LCD_WIDTH - len);
-      output[LCD_WIDTH] = '\0';
-      lcd.setCursor(0, 0);
-      lcd.print(output);
-      
-      memset(output, ' ', LCD_WIDTH);
-      output[LCD_WIDTH] = '\0';
-      lcd.setCursor(0, 1);
-      lcd.print(output);
+      sprintf(output, endReason != none ? "%ld%s ago" : "%ld%s", t, unit);
+      lcdPrintCentered(1, output);
       
       if (startStopButton.stateChanged(LOW, HIGH)) {
         pommodoro_end_time = millis() + POMMODORO_MINUTES * 60L * 1000L;
