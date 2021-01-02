@@ -2,7 +2,7 @@
 
 ## The circuit
 
-Breadboard view: 
+Breadboard view (maintained in [Fritzing file](circuit/pommodoro-timer.fzz)).
 
 ![breadboard view](circuit/pommodoro-timer_bb.svg)
 
