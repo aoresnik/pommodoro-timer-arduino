@@ -6,6 +6,10 @@ Breadboard view (maintained in [Fritzing file](circuit/pommodoro-timer.fzz)).
 
 ![breadboard view](circuit/pommodoro-timer_bb.svg)
 
+Schematics:
+
+![schematics](circuit/pommodoro-timer_schem.svg)
+
 Connections:
 
 LCD:
