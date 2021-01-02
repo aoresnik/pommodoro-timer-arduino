@@ -60,9 +60,15 @@ byte startSymbol[8] = {
   B10000,
 };
 
+// Custom character position for the "start" symbol
 #define CHAR_START 1
-#define CHARS_PROGRESS 4
 
+// Custom character positions for progress bar graphics
+#define CHARS_PROGRESS_START 4
+#define CHARS_PROGRESS_END 7
+
+// Progress bar elements: from empty char (space), to characters with 1-5 bars filled on the left.
+// Custom chars used for 1 to 4, existing characters used for 0 (' ') and 5 (0xFF).
 char progressChars[6];
 
 class Button {
@@ -156,11 +162,13 @@ void formatTimeUnit(char *s, int s_maxlen, long timeSeconds) {
   snprintf(s, s_maxlen, "%ld%s", t, unit);
 }
 
+// Initialize progress bar elements: from empty to all-filled cell and
+// 1-4 levels between
 void lcdCreateProgressBarChars() {
   byte charData[8];
   progressChars[0] = ' ';
   for (int i = 1; i <= 4; i++) {
-    char c = CHARS_PROGRESS + i-1;
+    char c = CHARS_PROGRESS_START + i-1;
     progressChars[i] = c;
     memset(charData, (0x1F << (5-i)) & 0x1F, 8);
     lcd.createChar(c, charData);
