@@ -33,8 +33,8 @@ You can determine when it's time to end the breaks (3-5 minutes for short breaks
 for long breaks). This is also intended to nudge you out of procrastination. A blinking green light
 is intended to remind you that a break is in progress, but you should not take too much time.
 
-If some external interruption occurs that warrants aborting the current Pommodoro, you press
-the start/stop key again. The device will show how long ago the abort happened:
+If some external interruption occurs that warrants aborting a Pommodoro when it's in progress, 
+you press the start/stop key again to abort. The device will show how long ago the abort happened:
 
 ```
   Last: aborted
@@ -45,22 +45,28 @@ There's no additional functionality, such as tracking the long and short breaks,
 The author of the Pommodooro technique recommends these to be done manuallly on pen and paper.
 The point of this device is only to help tracking time.
 
+## Limitations
+
 This is prototype for now  - I plan to design a 3D printed case for that, but it's not implemented yet.
+
+Power usage is not yet optimized, so it's recommended to be used plugged (USB or power supply), 
+batteries won't last long. On Arduino Uno it uses 70mA, while the 9V battery tipically can 
+supply 500mAh, so it will last less than a working day.
 
 ## FAQ
 
 ### Why separate device? There's an app for that!
 
 True, there are many apps for working with the Pommodoro technique, but it's less disrupting to 
-have a separate device for that, because you don't have to switch apps, move mouse, ....
+have a separate device for that, because you don't have to switch apps, move mouse and click, ....
 
-Alternatively, you can use an old Android/iPhone that you dedicate for Pommodoro timer app.
+True, you can use an old Android/iPhone that you dedicate for Pommodoro timer app.
 
 ## Assembly
 
 ### The circuit
 
-I used components from the Arduino Starter kit - other 
+I used components from the Arduino Starter Kit - other components can be used.
 
 Breadboard view (maintained in [Fritzing file](circuit/pommodoro-timer.fzz)).
 
@@ -86,7 +92,8 @@ can be used, but some may require changes.
 * LCD VSS pin to ground
 * LCD VCC pin to 5V
 * R1: 10K trimmer to adjust LCD contrast, ends to +5V and ground, wiper to LCD VO pin (pin 3)
-* R2: current limiter for LCD backlight
+* R2: current limiter for LCD backlight to LCD A pin
+* LCD K pin (backlight LED cathode) to ground
 
 Buttons:
 
