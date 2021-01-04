@@ -209,7 +209,7 @@ void loop() {
       lcdPrintfCentered(1, "%d sec", secondsRemaining);
       
       // Draw a bar graph of time remaining
-      lcdDrawBarGraph(0, secondsRemaining, POMMODORO_MINUTES*60);
+      lcdDrawBarGraph(0, POMMODORO_MINUTES*60-secondsRemaining, POMMODORO_MINUTES*60);
 
       if (secondsRemaining == 0) {
         state = waiting;
