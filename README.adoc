@@ -14,7 +14,15 @@ for personal productivity. It requires an Arduino (tested with Arduino
 Uno) with some additional hardware: LCD, switches and LEDs (documented
 below).
 
-== How to use
+== Project status
+
+The device works, but it's not actively improved further, because I'm not 
+actively using it. At the time of this writing, I can't use Pommodoro at 
+work, whereas in my private projects I'm experimenting with  another 
+productivity technique, with larger time blocks, which I'm  tracking in 
+a different way.
+
+= How to use
 
 You should read the entire documentation and the book on how to practice
 Pommodoro properly - this is only a short summary how this device can
@@ -60,8 +68,8 @@ this device is only to help tracking time.
 
 == Limitations
 
-This is prototype for now - I plan to design a 3D printed case for that,
-but it’s not implemented yet.
+The hardware and software work, but it looks like a prototype for now - 
+I plan to design a 3D printed case for that, but it’s not implemented yet.
 
 Power usage is not yet optimized, so it’s recommended to be used plugged
 (USB or power supply), batteries won’t last long. On Arduino Uno it uses
@@ -76,7 +84,7 @@ True, there are many apps for working with the Pommodoro technique, but
 it’s less disrupting to have a separate device for that, because you
 don’t have to switch apps, move mouse and click, ….
 
-True, you can use an old Android/iPhone that you dedicate for Pommodoro
+True, you can use an old Android/iPhone that you dedicate for a Pommodoro
 timer app.
 
 == Assembly
